@@ -99,11 +99,12 @@ def reverse_diff(
                     else:
                         assert isinstance(m.t, loma_ir.Array)
                         assert m.t.static_size is not None
+                        target_arr = target_m
                         for i in range(m.t.static_size):
-                            target_m = loma_ir.ArrayAccess(
-                                target_m, loma_ir.ConstInt(i), t=m.t.t
+                            target_i = loma_ir.ArrayAccess(
+                                target_arr, loma_ir.ConstInt(i), t=m.t.t
                             )
-                            stmts += assign_zero(target_m)
+                            stmts += assign_zero(target_i)
                 return stmts
             case _:
                 assert False
@@ -136,14 +137,16 @@ def reverse_diff(
                     else:
                         assert isinstance(m.t, loma_ir.Array)
                         assert m.t.static_size is not None
+                        target_arr = target_m
+                        deriv_arr = deriv_m
                         for i in range(m.t.static_size):
-                            target_m = loma_ir.ArrayAccess(
-                                target_m, loma_ir.ConstInt(i), t=m.t.t
+                            target_i = loma_ir.ArrayAccess(
+                                target_arr, loma_ir.ConstInt(i), t=m.t.t
                             )
-                            deriv_m = loma_ir.ArrayAccess(
-                                deriv_m, loma_ir.ConstInt(i), t=m.t.t
+                            deriv_i = loma_ir.ArrayAccess(
+                                deriv_arr, loma_ir.ConstInt(i), t=m.t.t
                             )
-                            stmts += accum_deriv(target_m, deriv_m, overwrite)
+                            stmts += accum_deriv(target_i, deriv_i, overwrite)
                 return stmts
             case _:
                 assert False

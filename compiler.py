@@ -16,15 +16,26 @@ import codegen_slang
 import ir
 
 ir.generate_asdl_file()
-import distutils.ccompiler
 import pathlib
 import platform
+import sysconfig
 
 import numpy as np
 
 import _asdl.loma as loma_ir
 import error
 import slangpy
+
+
+def shared_lib_extension() -> str:
+    suffix = sysconfig.get_config_var("SHLIB_SUFFIX")
+    if suffix:
+        return suffix
+    if platform.system() == "Windows":
+        return ".dll"
+    if platform.system() == "Darwin":
+        return ".dylib"
+    return ".so"
 
 
 def loma_to_ctypes_type(
@@ -130,9 +141,7 @@ def compile(
 
     if output_filename is not None:
         # + .dll or + .so
-        output_filename = (
-            output_filename + distutils.ccompiler.new_compiler().shared_lib_extension
-        )
+        output_filename = output_filename + shared_lib_extension()
         pathlib.Path(os.path.dirname(output_filename)).mkdir(
             parents=True, exist_ok=True
         )
